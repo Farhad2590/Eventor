@@ -58,10 +58,12 @@ const initiatePayment = async (req, res) => {
 const approveBooking = async (req, res) => {
   try {
     const { bookingId } = req.params;
+    console.log(bookingId);
+    
     const booking = await Booking.findByIdAndUpdate(
       bookingId,
       { 
-        status: "payment_pending" // Admin approves, now waiting for payment
+        status: "payment_pending" 
       },
       { new: true }
     );
@@ -69,9 +71,8 @@ const approveBooking = async (req, res) => {
     if (!booking) {
       return res.status(404).json({ error: "Booking not found" });
     }
-
-    // Send email notification to user about approval and payment request
-    // You would implement your email sending logic here
+    console.log(booking);
+    
 
     res.status(200).json(booking);
   } catch (error) {

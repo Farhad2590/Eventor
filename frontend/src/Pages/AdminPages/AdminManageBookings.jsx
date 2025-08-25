@@ -51,6 +51,7 @@ const AdminManageBookings = () => {
                 b._id === booking._id ? {...b, status: "payment_pending"} : b
               ));
             }
+            
           });
       }
     });

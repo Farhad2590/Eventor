@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
-import { FaBookmark, FaRegBookmark, FaCalendarAlt, FaUsers, FaClock, FaVideo, FaDollarSign } from "react-icons/fa";
+import {
+  FaBookmark,
+  FaRegBookmark,
+  FaCalendarAlt,
+  FaUsers,
+  FaClock,
+  FaVideo,
+  FaDollarSign,
+} from "react-icons/fa";
 import useAuth from "../../../../hooks/useAuth";
 import Swal from "sweetalert2";
 import DatePickerModal from "./DatePickerModal";
@@ -21,7 +29,9 @@ const EventDetailPage = () => {
       try {
         const response = await axiosSecure.get(`/events/${id}`);
         setEvent(response.data);
-        setIsBookmarked(response.data.bookmarked_by?.includes(user?._id) || false);
+        setIsBookmarked(
+          response.data.bookmarked_by?.includes(user?._id) || false
+        );
         setLoading(false);
       } catch (error) {
         console.error("Error fetching event:", error);
@@ -65,30 +75,48 @@ const EventDetailPage = () => {
     setModalOpen(true);
   };
 
+  // In EventDetailPage.jsx, update the handleConfirmBooking function:
+
   const handleConfirmBooking = async () => {
     try {
       const bookingData = {
         eventId: event._id,
+        userId: user.uid,
+        userEmail: user.email,
+        userName: user.displayName,
+        userPhoto: user.photoURL,
+        packageName: event.package_name,
+        cart_Image: event.cart_Image,
         date: selectedDate,
         totalPrice: event.price,
-        status: "pending"
+        features: event.features || [],
+        photographyTeamSize: event.photography_team_size,
+        videography: event.videography,
+        durationHours: event.duration_hours,
+        expectedAttendance: event.expected_attendance,
+        staffTeamSize: event.staff_team_size,
+        status: "pending",
+        paymentStatus: "pending",
+        finalPrice: event.price, // Same as totalPrice for simple booking
       };
 
       const response = await axiosSecure.post("/bookings", bookingData);
-      if (response.data.insertedId) {
+      if (response.data._id) {
         Swal.fire({
-          title: "Booking Confirmed!",
-          text: "Your event has been booked successfully",
+          title: "Booking Request Submitted!",
+          text: "Your booking request has been submitted for admin approval",
           icon: "success",
           confirmButtonColor: "#179ac8",
         });
         setModalOpen(false);
+        // Optionally navigate to user bookings page
+        // navigate('/my-bookings');
       }
     } catch (error) {
       console.error("Error creating booking:", error);
       Swal.fire({
         title: "Error",
-        text: "Failed to book event",
+        text: "Failed to submit booking request",
         icon: "error",
         confirmButtonColor: "#179ac8",
       });
@@ -159,7 +187,9 @@ const EventDetailPage = () => {
             <h2 className="text-2xl font-bold mb-4 text-[#179ac8]">
               Package Details
             </h2>
-            <p className="text-gray-700 mb-6">{event.description || "No description available"}</p>
+            <p className="text-gray-700 mb-6">
+              {event.description || "No description available"}
+            </p>
 
             <h3 className="text-xl font-semibold mb-3 text-[#179ac8]">
               What's Included
@@ -188,14 +218,18 @@ const EventDetailPage = () => {
                 <FaUsers className="text-[#179ac8] mr-3 text-xl" />
                 <div>
                   <p className="text-gray-500 text-sm">Photography Team</p>
-                  <p className="font-medium">{event.photography_team_size} members</p>
+                  <p className="font-medium">
+                    {event.photography_team_size} members
+                  </p>
                 </div>
               </div>
               <div className="flex items-center p-4 bg-gray-50 rounded-lg">
                 <FaVideo className="text-[#179ac8] mr-3 text-xl" />
                 <div>
                   <p className="text-gray-500 text-sm">Videography</p>
-                  <p className="font-medium">{event.videography ? "Included" : "Not included"}</p>
+                  <p className="font-medium">
+                    {event.videography ? "Included" : "Not included"}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center p-4 bg-gray-50 rounded-lg">
@@ -235,7 +269,9 @@ const EventDetailPage = () => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Base Price:</span>
-                  <span className="font-bold">${event.price?.toLocaleString()}</span>
+                  <span className="font-bold">
+                    ${event.price?.toLocaleString()}
+                  </span>
                 </div>
 
                 <button

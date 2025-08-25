@@ -14,7 +14,7 @@ router.post("/", createBooking);
 router.get("/user/:email", getUserBookings);
 router.get("/bookings", getBookings);
 router.patch("/:bookingId/complete", completeEvent)
-router.patch("/:bookingId//approve", approveBooking)
+router.patch("/:bookingId/approve", approveBooking)
 
 // Payment routes
 router.get("/:bookingId/payment/initiate", paymentController.initiatePayment);
